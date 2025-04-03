@@ -122,9 +122,43 @@ begin
 		--assert that after pressing left, after 1 clock cycle, the output for left is 001 (only LA is lit up)
 		w_iL <= '1'; wait for k_clk_period;--input left and wait a cycle
 		  assert (w_oL = "001" AND w_oR = "000") report "bad LA" severity failure;
-		--assert that after another cycle, the output for left is 010 (LA+LB is lit up)
+		--assert that after another cycle, the output for left is 011 (LA+LB is lit up)
 		wait for k_clk_period;
-		  assert (w_oL = "010" AND w_oR = "000") report "bad LB" severity failure;
+		  assert (w_oL = "011" AND w_oR = "000") report "bad LB" severity failure;
+	   --assert that after another cycle, the output for left is 111 (LA+LB+LC is lit up)
+		wait for k_clk_period;
+		  assert (w_oL = "111" AND w_oR = "000") report "bad LC" severity failure;
+		--assert that after another cycle, the output for both is 0 (goes back to off state)
+		wait for k_clk_period;
+		  assert (w_oL = "000" AND w_oR = "000") report "bad off after LC" severity failure;
+		
+		w_iL <= '0';--reset the left input
+		wait for k_clk_period;--extra wait 
+		
+		--Same tests as above but for right side
+		w_iR <= '1'; wait for k_clk_period;--input right and wait a cycle
+		  assert (w_oR = "001" AND w_oL = "000") report "bad RA" severity failure;
+		--RB
+		wait for k_clk_period;
+		  assert (w_oR = "011" AND w_oL = "000") report "bad RB" severity failure;
+	   --RC
+		wait for k_clk_period;
+		  assert (w_oR = "111" AND w_oL = "000") report "bad RC" severity failure;
+		--assert that after another cycle, the output for both is 0 (goes back to off state)
+		wait for k_clk_period;
+		  assert (w_oL = "000" AND w_oR = "000") report "bad off after RC" severity failure;
+		
+		w_iR <= '0';--reset the right input
+		wait for k_clk_period;--extra wait
+		
+		--Test hazards
+		w_iR <= '1';
+		w_iL <= '1';--turn on both inputs
+		
+		wait for k_clk_period;
+		  assert (w_oR = "111" AND w_oL = "111") report "bad Hazards" severity failure;
+		
+		--At this point, the core functionality of left and right work as intended. We now must test edge cases
 		
 		
 		
