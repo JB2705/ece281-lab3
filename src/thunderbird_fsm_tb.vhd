@@ -160,6 +160,16 @@ begin
 		
 		--At this point, the core functionality of left and right work as intended. We now must test edge cases
 		
+		w_iR <= '0';
+		w_iL <= '0';--turn back off both inputs
+		wait for k_clk_period;
+		--test that if left is hit, it runs through all left lights even if left is changed to off
+		w_iL <= '1';--hit left
+		wait for k_clk_period;--wait a cycle (LA should be on)
+		
+		w_iL <= '0'; wait for k_clk_period;--turn left off, wait (still should be on LB)
+		  assert (w_oL = "011" AND w_oR = "000") report "bad edge" severity failure;
+		
 		
 		
 		wait;
